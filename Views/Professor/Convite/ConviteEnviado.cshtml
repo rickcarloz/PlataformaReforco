@@ -1,0 +1,13 @@
+@{
+    ViewData["Title"] = "Convite Enviado";
+    var link = ViewBag.LinkConvite as string;
+    var email = ViewBag.Email as string;
+}
+
+<h1>Convite Enviado!</h1>
+<p>O convite para <b>@email</b> foi gerado com sucesso.</p>
+<p>Link de acesso (simulação de e-mail):</p>
+<div class="alert alert-info">
+    <a href="@link">@link</a>
+</div>
+<a asp-action="Index" class="btn btn-primary">Voltar para lista de convites</a> 

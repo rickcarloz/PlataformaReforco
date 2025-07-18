@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Aceitar Convite";
+    var token = ViewBag.Token as string;
+    var turmaId = ViewBag.TurmaId;
+    var email = ViewBag.Email as string;
+}
+
+<h1>Aceitar Convite</h1>
+<p>Cadastro para o e-mail: <b>@email</b></p>
+<form asp-action="Aceitar" method="post">
+    <input type="hidden" name="token" value="@token" />
+    <input type="hidden" name="turmaId" value="@turmaId" />
+    <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" name="senha" class="form-control" required minlength="6" />
+    </div>
+    <div class="form-group">
+        <label for="confirmaSenha">Confirme a Senha</label>
+        <input type="password" name="confirmaSenha" class="form-control" required minlength="6" />
+    </div>
+    <button type="submit" class="btn btn-success mt-3">Finalizar Cadastro</button>
+</form> 

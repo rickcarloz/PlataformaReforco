@@ -1,0 +1,30 @@
+@model IEnumerable<PlataformaReforco.Models.Convite>
+@{
+    ViewData["Title"] = "Convites Enviados";
+}
+
+<h1>Convites Enviados</h1>
+<a class="btn btn-primary mb-3" asp-action="Create">Convidar Novo Aluno</a>
+<table class="table table-dark table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Token</th>
+            <th>Data de Envio</th>
+            <th>Expira em</th>
+            <th>Usado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var convite in Model)
+        {
+            <tr>
+                <td>@convite.Email</td>
+                <td>@convite.Token</td>
+                <td>@convite.DataEnvio.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@convite.DataExpiracao.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@(convite.Usado ? "Sim" : "Não")</td>
+            </tr>
+        }
+    </tbody>
+</table> 
