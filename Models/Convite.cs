@@ -5,18 +5,13 @@ namespace PlataformaReforco.Models
 {
     public class Convite
     {
-        [Key]
         public Guid Id { get; set; }
-
-        [Required]
-        [EmailAddress]
         public string Email { get; set; }
-
-        [Required]
         public string Token { get; set; }
-
+        public Guid TurmaId { get; set; }
+        public Turma Turma { get; set; }
         public DateTime DataEnvio { get; set; } = DateTime.Now;
         public DateTime DataExpiracao { get; set; }
-        public bool Usado { get; set; } = false;
+        public bool Aceito { get; set; } = false;
     }
 } 

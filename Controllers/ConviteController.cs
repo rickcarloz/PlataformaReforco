@@ -23,7 +23,7 @@ namespace PlataformaReforco.Controllers
         [HttpGet]
         public IActionResult Aceitar(string token, Guid turmaId)
         {
-            var convite = _context.Convites.FirstOrDefault(c => c.Token == token && !c.Usado && c.DataExpiracao > DateTime.Now);
+            var convite = _context.Convites.FirstOrDefault(c => c.Token == token && !c.Aceito && c.DataExpiracao > DateTime.Now);
             if (convite == null)
             {
                 return View("ConviteInvalido");
@@ -39,7 +39,7 @@ namespace PlataformaReforco.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Aceitar(string token, Guid turmaId, string senha, string confirmaSenha)
         {
-            var convite = _context.Convites.FirstOrDefault(c => c.Token == token && !c.Usado && c.DataExpiracao > DateTime.Now);
+            var convite = _context.Convites.FirstOrDefault(c => c.Token == token && !c.Aceito && c.DataExpiracao > DateTime.Now);
             if (convite == null)
             {
                 return View("ConviteInvalido");
@@ -68,10 +68,9 @@ namespace PlataformaReforco.Controllers
             // Salva usuário na tabela Usuarios (domínio)
             var usuario = new Usuario
             {
-                Id = Guid.Parse(user.Id),
+                Id = user.Id,
                 Nome = convite.Email,
                 Email = convite.Email,
-                SenhaHash = user.PasswordHash,
                 DataCriacao = DateTime.Now,
                 Ativo = true,
                 TipoUsuario = TipoUsuario.Aluno,
@@ -79,7 +78,7 @@ namespace PlataformaReforco.Controllers
             };
             _context.Usuarios.Add(usuario);
             // Marca convite como usado
-            convite.Usado = true;
+            convite.Aceito = true;
             await _context.SaveChangesAsync();
             return RedirectToAction("Login", "Account", new { area = "Identity" });
         }

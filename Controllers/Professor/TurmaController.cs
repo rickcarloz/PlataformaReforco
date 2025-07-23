@@ -40,7 +40,7 @@ namespace PlataformaReforco.Controllers.Professor
             if (ModelState.IsValid)
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-                turma.ProfessorId = Guid.Parse(userId);
+                turma.ProfessorId = userId;
                 turma.DataCriacao = DateTime.Now;
                 turma.Ativa = true;
                 _context.Add(turma);

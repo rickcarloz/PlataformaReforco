@@ -12,7 +12,6 @@
             <th>Token</th>
             <th>Data de Envio</th>
             <th>Expira em</th>
-            <th>Usado</th>
         </tr>
     </thead>
     <tbody>
@@ -23,7 +22,6 @@
                 <td>@convite.Token</td>
                 <td>@convite.DataEnvio.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>@convite.DataExpiracao.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@(convite.Usado ? "Sim" : "Não")</td>
             </tr>
         }
     </tbody>

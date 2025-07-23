@@ -51,7 +51,7 @@ namespace PlataformaReforco.Controllers.Professor
                 Token = token,
                 DataEnvio = DateTime.Now,
                 DataExpiracao = DateTime.Now.AddHours(48),
-                Usado = false
+                Aceito = false
             };
             _context.Convites.Add(convite);
             await _context.SaveChangesAsync();
