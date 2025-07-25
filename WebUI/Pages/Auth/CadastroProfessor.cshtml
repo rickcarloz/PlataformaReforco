@@ -1,0 +1,40 @@
+@page
+@model WebUI.Pages.Auth.CadastroProfessorModel
+@{
+    ViewData["Title"] = "Cadastro de Professor";
+}
+<div class="auth-wrapper">
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="alert" style="background:#e6ffed;color:#008c4a;border:1px solid #008c4a55;max-width:480px;min-width:350px;">
+                @Model.SuccessMessage
+            </div>
+            <a class="turmas-btn" href="/Auth/Login" style="margin-top:1.5rem;display:block;text-align:center;max-width:200px;">Voltar ao Login</a>
+        </div>
+    }
+    else
+    {
+        <form method="post" style="max-width: 480px; min-width: 350px;">
+            <h2 style="margin-bottom: 1.5rem; text-align:center; color:#008cff;">Cadastro de Professor</h2>
+            <div>
+                <label asp-for="Professor.NOME">Nome Completo</label>
+                <input asp-for="Professor.NOME" required />
+            </div>
+            <div>
+                <label asp-for="Professor.EMAIL">E-mail</label>
+                <input asp-for="Professor.EMAIL" type="email" required />
+            </div>
+            <div>
+                <label asp-for="Professor.USUARIO">Usuário</label>
+                <input asp-for="Professor.USUARIO" required />
+            </div>
+            <button type="submit">Cadastrar</button>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert">@Model.ErrorMessage</div>
+            }
+            <a class="turmas-btn" href="/Auth/Login" style="margin-top:1rem;display:block;text-align:center;">Voltar ao Login</a>
+        </form>
+    }
+</div> 

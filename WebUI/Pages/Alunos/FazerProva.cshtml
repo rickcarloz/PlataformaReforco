@@ -1,0 +1,345 @@
+@page
+@model WebUI.Pages.Alunos.FazerProvaModel
+@{
+    ViewData["Title"] = "Fazer Prova";
+}
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">
+                <a href="/Alunos/Provas">Minhas Provas</a>
+            </div>
+            <div class="ps-3">
+                <i class="bx bx-chevron-right"></i>
+                <span>@Model.Prova?.Titulo</span>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (Model.Prova != null)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">@Model.Prova.Titulo</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <small class="text-muted">Tempo restante:</small>
+                                <div id="timer" class="fw-bold text-danger"></div>
+                            </div>
+                            <div class="me-3">
+                                <small class="text-muted">Questão:</small>
+                                <div id="questao-atual" class="fw-bold">1 de @Model.Prova.Questoes.Count</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Prova.Descricao))
+                    {
+                        <div class="alert alert-info mb-4">
+                            <strong>Descrição:</strong> @Model.Prova.Descricao
+                        </div>
+                    }
+
+                    <form method="post" id="provaForm">
+                        <input type="hidden" name="ProvaId" value="@Model.Prova.ID" />
+                        <input type="hidden" name="ProvaAlunoId" value="@Model.ProvaAlunoId" />
+
+                        <!-- Campos hidden fixos para cada questão -->
+                        @for (int i = 0; i < Model.Prova.Questoes.Count; i++)
+                        {
+                            var questao = Model.Prova.Questoes[i];
+                            <input type="hidden" name="Respostas[@i].QuestaoId" value="@questao.ID" />
+                            <input type="hidden" name="Respostas[@i].AlternativaId" id="hidden_alternativa_@i" value="" />
+                        }
+
+                        <div id="questoes-container">
+                            @for (int i = 0; i < Model.Prova.Questoes.Count; i++)
+                            {
+                                var questao = Model.Prova.Questoes[i];
+                                <div class="questao-item @(i == 0 ? "" : "d-none")" data-questao="@i">
+                                    <div class="mb-4">
+                                        <h6 class="mb-3">
+                                            Questão @(i + 1) de @Model.Prova.Questoes.Count
+                                            @if (questao.Pontos > 1)
+                                            {
+                                                <span class="badge bg-primary ms-2">@questao.Pontos pontos</span>
+                                            }
+                                        </h6>
+                                        <p class="mb-4">@questao.Enunciado</p>
+
+                                        <div class="alternativas">
+                                            @for (int j = 0; j < questao.Alternativas.Count; j++)
+                                            {
+                                                var alternativa = questao.Alternativas[j];
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="radio_questao_@i" 
+                                                           value="@alternativa.ID" 
+                                                           id="questao_@(i)_alt_@(j)" 
+                                                           data-questao-index="@i" />
+                                                    <label class="form-check-label" for="questao_@(i)_alt_@(j)">
+                                                        <strong>@alternativa.Letra)</strong> @alternativa.Texto
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-secondary" id="btn-anterior" onclick="questaoAnterior()" style="display: none;">
+                                <i class="bx bx-chevron-left"></i> Anterior
+                            </button>
+                            
+                            <div class="d-flex gap-2">
+                                @for (int i = 0; i < Model.Prova.Questoes.Count; i++)
+                                {
+                                    <button type="button" class="btn btn-outline-primary btn-sm questao-btn" onclick="irParaQuestao(@i)" data-questao="@i">
+                                        @(i + 1)
+                                    </button>
+                                }
+                            </div>
+
+                            <div>
+                                <button type="button" class="btn btn-primary" id="btn-proximo" onclick="proximaQuestao()">
+                                    Próxima <i class="bx bx-chevron-right"></i>
+                                </button>
+                                <button type="submit" class="btn btn-success" id="btn-finalizar" style="display: none;">
+                                    <i class="bx bx-check"></i> Finalizar Prova
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+let questaoAtual = 0;
+const totalQuestoes = @(Model.Prova?.Questoes?.Count ?? 0);
+let tempoRestante = @(Model.TempoRestante);
+let timerInterval;
+
+function iniciarTimer() {
+    if (tempoRestante <= 0) {
+        document.getElementById('timer').textContent = "00:00";
+        return;
+    }
+    
+    atualizarTimer();
+    timerInterval = setInterval(() => {
+        tempoRestante--;
+        atualizarTimer();
+        
+        if (tempoRestante <= 0) {
+            clearInterval(timerInterval);
+            alert('Tempo esgotado! A prova será finalizada automaticamente.');
+            document.getElementById('provaForm').submit();
+        }
+    }, 1000);
+}
+
+function atualizarTimer() {
+    const minutos = Math.floor(tempoRestante / 60);
+    const segundos = tempoRestante % 60;
+    const timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    }
+}
+
+function mostrarQuestao(index) {
+    if (totalQuestoes === 0) return;
+    
+    // Ocultar todas as questões
+    document.querySelectorAll('.questao-item').forEach(item => {
+        item.classList.add('d-none');
+    });
+    
+    // Mostrar questão atual
+    const questaoElement = document.querySelector(`[data-questao="${index}"]`);
+    if (questaoElement) {
+        questaoElement.classList.remove('d-none');
+    }
+    
+    // Atualizar botões
+    const btnAnterior = document.getElementById('btn-anterior');
+    const btnProximo = document.getElementById('btn-proximo');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+    
+    if (btnAnterior) btnAnterior.style.display = index === 0 ? 'none' : 'inline-block';
+    if (btnProximo) btnProximo.style.display = index === totalQuestoes - 1 ? 'none' : 'inline-block';
+    if (btnFinalizar) btnFinalizar.style.display = index === totalQuestoes - 1 ? 'inline-block' : 'none';
+    
+    // Atualizar indicador de questão
+    const questaoAtualElement = document.getElementById('questao-atual');
+    if (questaoAtualElement) {
+        questaoAtualElement.textContent = `${index + 1} de ${totalQuestoes}`;
+    }
+    
+    // Atualizar botões de navegação
+    document.querySelectorAll('.questao-btn').forEach((btn, i) => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline-primary');
+        if (i === index) {
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-primary');
+        }
+    });
+}
+
+function proximaQuestao() {
+    if (questaoAtual < totalQuestoes - 1) {
+        questaoAtual++;
+        mostrarQuestao(questaoAtual);
+    }
+}
+
+function questaoAnterior() {
+    if (questaoAtual > 0) {
+        questaoAtual--;
+        mostrarQuestao(questaoAtual);
+    }
+}
+
+function irParaQuestao(index) {
+    questaoAtual = index;
+        mostrarQuestao(questaoAtual);
+}
+
+// Marcar questões respondidas
+function marcarQuestaoRespondida(questaoIndex) {
+    const radioButtons = document.querySelectorAll(`input[name="radio_questao_${questaoIndex}"]`);
+    const respondida = Array.from(radioButtons).some(radio => radio.checked);
+    
+    const btn = document.querySelector(`.questao-btn[data-questao="${questaoIndex}"]`);
+    if (btn) {
+        if (respondida) {
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-success');
+        } else {
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-primary');
+        }
+    }
+}
+
+// Event listeners para radio buttons
+document.addEventListener('change', function(e) {
+    if (e.target.type === 'radio' && e.target.name.includes('radio_questao_')) {
+        const questaoIndex = parseInt(e.target.getAttribute('data-questao-index'));
+        const alternativaId = e.target.value;
+        
+        console.log(`Radio selecionado: Questão ${questaoIndex}, Alternativa ${alternativaId}`);
+        
+        // Atualizar o campo hidden correspondente
+        const hiddenInput = document.getElementById(`hidden_alternativa_${questaoIndex}`);
+        if (hiddenInput) {
+            hiddenInput.value = alternativaId;
+            console.log(`Atualizado campo hidden: name="${hiddenInput.name}", value="${hiddenInput.value}"`);
+        }
+        
+        marcarQuestaoRespondida(questaoIndex);
+    }
+});
+
+// Função para coletar todas as respostas antes de enviar
+document.getElementById('provaForm').addEventListener('submit', function(e) {
+    console.log('=== DEBUG: Formulário sendo enviado ===');
+    
+    // Garantir que todas as questões tenham uma resposta
+    let todasRespondidas = true;
+    const respostas = [];
+    
+    for (let i = 0; i < totalQuestoes; i++) {
+        const radioButtons = document.querySelectorAll(`input[name="radio_questao_${i}"]`);
+        const alternativaSelecionada = document.getElementById(`hidden_alternativa_${i}`);
+        
+        console.log(`Questão ${i}:`);
+        console.log(`  - Radio buttons encontrados: ${radioButtons.length}`);
+        console.log(`  - Algum radio selecionado: ${Array.from(radioButtons).some(radio => radio.checked)}`);
+        console.log(`  - Alternativa selecionada: ${alternativaSelecionada ? alternativaSelecionada.value : 'NÃO ENCONTRADA'}`);
+        
+        if (!Array.from(radioButtons).some(radio => radio.checked) || !alternativaSelecionada || !alternativaSelecionada.value) {
+            todasRespondidas = false;
+            console.log(`  ✗ Questão ${i} não respondida completamente`);
+            break;
+        }
+        
+        respostas.push({
+            questaoIndex: i,
+            questaoId: document.querySelector(`input[name="Respostas[${i}].QuestaoId"]`).value,
+            alternativaId: alternativaSelecionada.value
+        });
+        console.log(`  ✓ Questão ${i} respondida: ${document.querySelector(`input[name="Respostas[${i}].QuestaoId"]`).value} -> ${alternativaSelecionada.value}`);
+    }
+    
+    if (!todasRespondidas) {
+        e.preventDefault();
+        alert('Por favor, responda todas as questões antes de finalizar a prova.');
+        return false;
+    }
+    
+    console.log('Respostas coletadas:', respostas);
+    
+    // Debug: Mostrar todos os campos do formulário
+    const formData = new FormData(this);
+    console.log('=== DEBUG: Campos do FormData ===');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+});
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    iniciarTimer();
+    if (totalQuestoes > 0) {
+        mostrarQuestao(0);
+        
+        // Marcar questões já respondidas
+        for (let i = 0; i < totalQuestoes; i++) {
+            marcarQuestaoRespondida(i);
+        }
+    }
+});
+
+// Confirmar antes de sair
+window.addEventListener('beforeunload', function(e) {
+    if (tempoRestante > 0) {
+        e.preventDefault();
+        e.returnValue = 'Tem certeza que deseja sair? Suas respostas podem ser perdidas.';
+    }
+});
+</script>
+
+<style>
+.questao-btn {
+    min-width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.questao-btn.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+</style> 

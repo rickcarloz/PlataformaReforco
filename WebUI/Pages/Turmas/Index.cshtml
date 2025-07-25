@@ -1,0 +1,52 @@
+@page
+@model WebUI.Pages.Turmas.IndexModel
+@{
+    ViewData["Title"] = "Turmas";
+}
+<div class="turmas-container">
+    <h2 style="color:#008cff;">Turmas</h2>
+    <button class="turmas-btn" onclick="location.href='@Url.Page("/Turmas/Form")'">Nova Turma</button>
+    <table class="turmas-table">
+        <thead>
+            <tr>
+                <th>Disciplina</th>
+                <th>Série</th>
+                <th>Turno</th>
+                <th>Ano</th>
+                <th>Professor</th>
+                <th>Alunos</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Turmas != null && Model.Turmas.Any())
+            {
+                foreach (var turma in Model.Turmas)
+                {
+                    <tr>
+                        <td>@turma.Disciplina</td>
+                        <td>@turma.Serie</td>
+                        <td>@turma.Turno</td>
+                        <td>@turma.Ano</td>
+                        <td>@turma.ProfessorNome</td>
+                        <td>
+                            <button class="turmas-btn small" onclick="location.href='@Url.Page("/Turmas/Alunos", new { id = turma.ID })'">
+                                Ver Alunos (@turma.QuantidadeAlunos)
+                            </button>
+                        </td>
+                        <td>
+                            <button class="turmas-btn" onclick="location.href='@Url.Page("/Turmas/Form", new { id = turma.ID })'">Editar</button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@turma.ID" style="display:inline;">
+                                <button class="turmas-btn danger" type="submit" onclick="return confirm('Deseja realmente excluir?')">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="7">Nenhuma turma encontrada.</td></tr>
+            }
+        </tbody>
+    </table>
+</div> 

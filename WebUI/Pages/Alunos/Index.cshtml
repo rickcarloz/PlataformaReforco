@@ -1,0 +1,46 @@
+@page
+@model WebUI.Pages.Alunos.IndexModel
+@{
+    ViewData["Title"] = "Alunos";
+}
+<div class="turmas-container">
+    <h2 style="color:#008cff;">Alunos</h2>
+    <button class="turmas-btn" onclick="location.href='@Url.Page("/Alunos/Cadastro")'">Novo Aluno</button>
+    <table class="turmas-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Usuário</th>
+                <th>Turma</th>
+                <th>Professor</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Alunos != null && Model.Alunos.Any())
+            {
+                foreach (var aluno in Model.Alunos)
+                {
+                    <tr>
+                        <td>@aluno.Nome</td>
+                        <td>@aluno.Email</td>
+                        <td>@aluno.Usuario</td>
+                        <td>@aluno.TurmaNome</td>
+                        <td>@aluno.ProfessorNome</td>
+                        <td>
+                            <button class="turmas-btn" onclick="location.href='@Url.Page("/Alunos/Form", new { id = aluno.ID })'">Editar</button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@aluno.ID" style="display:inline;">
+                                <button class="turmas-btn danger" type="submit" onclick="return confirm('Deseja realmente excluir?')">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6">Nenhum aluno encontrado.</td></tr>
+            }
+        </tbody>
+    </table>
+</div> 

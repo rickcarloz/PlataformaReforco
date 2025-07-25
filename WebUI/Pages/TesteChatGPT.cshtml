@@ -1,0 +1,49 @@
+@page
+@model WebUI.Pages.TesteChatGPTModel
+@{
+    ViewData["Title"] = "Teste ChatGPT";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Teste de Integração com ChatGPT</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success">
+                            @Model.SuccessMessage
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    <form method="post">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-robot me-2"></i>
+                            Testar ChatGPT
+                        </button>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(Model.Recomendacoes))
+                    {
+                        <div class="mt-4">
+                            <h5>Recomendações Geradas:</h5>
+                            <div class="border rounded p-3 bg-light">
+                                <pre style="white-space: pre-wrap;">@Model.Recomendacoes</pre>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

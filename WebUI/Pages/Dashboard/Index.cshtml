@@ -1,0 +1,109 @@
+@page
+@model WebUI.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+    <h2 style="margin-bottom: 2rem; color:#008cff;">Bem-vindo, @Model.UserName!</h2>
+    @if (!string.IsNullOrEmpty(Model.ApiMessage))
+    {
+        <div class="alert">
+            @Model.ApiMessage
+        </div>
+    }
+
+    @if (Model.UserRole == "Aluno")
+    {
+        <!-- Dashboard do Aluno -->
+        <div class="card mb-4" style="max-width:800px;width:100%;">
+            <div class="card-header"><b>Conteúdos Recomendados para Estudo</b></div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var conteudo in Model.ConteudosRecomendados)
+                    {
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@conteudo.Titulo</h5>
+                                    <p class="card-text">@conteudo.Descricao</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-primary">@conteudo.Tipo</span>
+                                        <span class="badge bg-info">@conteudo.Duracao</span>
+                                        <span class="badge bg-@(conteudo.Prioridade == "Alta" ? "danger" : conteudo.Prioridade == "Média" ? "warning" : "success")">@conteudo.Prioridade</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Dashboard do Professor -->
+        <div class="card mb-4" style="max-width:600px;width:100%;">
+            <div class="card-header"><b>Comparação entre Turmas</b></div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Turma</th><th>Média de Notas</th></tr></thead>
+                    <tbody>
+                    @foreach (var turma in Model.ComparacaoTurmas)
+                    {
+                        <tr>
+                            <td>@turma.Nome</td>
+                            <td>@turma.Media.ToString("F1")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row" style="width:100%; max-width:1200px;">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header"><b>Ranking dos 10 Melhores Alunos</b></div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead><tr><th>Posição</th><th>Nome</th><th>Turma</th><th>Nota</th></tr></thead>
+                            <tbody>
+                            @for (int i = 0; i < Model.RankingAlunos.Count; i++)
+                            {
+                                <tr>
+                                    <td>@(i+1)º</td>
+                                    <td>@Model.RankingAlunos[i].Nome</td>
+                                    <td>@Model.RankingAlunos[i].Turma</td>
+                                    <td>@Model.RankingAlunos[i].Nota.ToString("F1")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header"><b>Alunos que Precisam de Mais Atenção</b></div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead><tr><th>Nome</th><th>Turma</th><th>Nota</th><th>Observação</th></tr></thead>
+                            <tbody>
+                            @foreach (var aluno in Model.RankingAlunosAtencao)
+                            {
+                                <tr>
+                                    <td>@aluno.Nome</td>
+                                    <td>@aluno.Turma</td>
+                                    <td>@aluno.Nota.ToString("F1")</td>
+                                    <td>@aluno.Observacao</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div> 

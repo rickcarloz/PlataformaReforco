@@ -1,0 +1,87 @@
+@page
+@model WebUI.Pages.Provas.IndexModel
+@{
+    ViewData["Title"] = "Provas";
+}
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Provas</div>
+            <div class="ps-3 ms-auto">
+                <a href="/Provas/Form" class="btn btn-primary px-3">
+                    <i class="bx bx-plus"></i> Nova Prova
+                </a>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Turma</th>
+                                <th>Professor</th>
+                                <th>Questões</th>
+                                <th>Tempo (min)</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Provas != null && Model.Provas.Any())
+                            {
+                                @foreach (var prova in Model.Provas)
+                                {
+                                    <tr>
+                                        <td>@prova.Titulo</td>
+                                        <td>@prova.TurmaNome</td>
+                                        <td>@prova.ProfessorNome</td>
+                                        <td>@prova.QuantidadeQuestoes</td>
+                                        <td>@prova.TempoLimite</td>
+                                        <td>
+                                            <span class="status-badge @(prova.Ativa ? "active" : "inactive")">
+                                                @(prova.Ativa ? "Ativa" : "Inativa")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="turmas-btn" onclick="location.href='@Url.Page("/Provas/Form", new { id = prova.ID })'">Editar</button>
+                                            <button class="turmas-btn" onclick="location.href='@Url.Page("/Provas/Detalhes", new { id = prova.ID })'">Ver</button>
+                                            <form method="post" asp-page-handler="Delete" asp-route-id="@prova.ID" style="display:inline;">
+                                                <button class="turmas-btn danger" type="submit" onclick="return confirm('Deseja realmente excluir esta prova?')">Excluir</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center">Nenhuma prova encontrada.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

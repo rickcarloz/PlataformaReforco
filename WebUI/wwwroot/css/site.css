@@ -1,0 +1,275 @@
+/* Ajustes mínimos para integração com Dashrock */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7f7ff;
+}
+
+.turmas-container, .turmas-form-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px 0 rgb(218 218 253 / 65%);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 800px;
+}
+.turmas-form-container {
+    max-width: 400px;
+}
+.turmas-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.turmas-table th, .turmas-table td {
+    padding: 0.8rem 1rem;
+    text-align: left;
+}
+.turmas-table th {
+    background: #f7f7ff;
+    color: #008cff;
+    font-weight: 700;
+}
+.turmas-table tr {
+    border-bottom: 1px solid #e4e4e4;
+}
+.turmas-table tr:last-child {
+    border-bottom: none;
+}
+.turmas-btn {
+    background: #008cff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    margin-bottom: 0.2rem;
+    transition: background 0.2s;
+    display: inline-block;
+}
+.turmas-btn:hover {
+    background: #005fa3;
+}
+.turmas-btn.danger {
+    background: #ff6bcb;
+    color: #fff;
+}
+.turmas-btn.danger:hover {
+    background: #a259ff;
+    color: #fff;
+}
+.turmas-btn.small {
+    padding: 5px 10px;
+    font-size: 12px;
+    min-width: auto;
+}
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.status-badge.active {
+    background: #e6ffed;
+    color: #008c4a;
+}
+.status-badge.inactive {
+    background: #ffe6f6;
+    color: #a259ff;
+}
+.turmas-form-container label {
+    color: #008cff;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+.turmas-form-container input,
+.turmas-form-container select {
+    background: #f7f7ff;
+    color: #4c5258;
+    border: 1px solid #e4e4e4;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.turmas-form-container input:focus,
+.turmas-form-container select:focus {
+    border: 1.5px solid #008cff;
+}
+@media (max-width: 900px) {
+    .turmas-container, .turmas-form-container {
+        padding: 1rem;
+        max-width: 98vw;
+    }
+    .turmas-table th, .turmas-table td {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.95rem;
+    }
+}
+@media (max-width: 600px) {
+    .turmas-container, .turmas-form-container {
+        padding: 0.5rem;
+        max-width: 100vw;
+    }
+    .turmas-table th, .turmas-table td {
+        font-size: 0.9rem;
+    }
+}
+/* Login */
+.auth-wrapper form {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px 0 rgb(218 218 253 / 65%);
+    padding: 2rem;
+    min-width: 320px;
+    max-width: 350px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+.auth-wrapper label {
+    color: #008cff;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.auth-wrapper input[type="text"],
+.auth-wrapper input[type="password"] {
+    background: #f7f7ff;
+    color: #4c5258;
+    border: 1px solid #e4e4e4;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.auth-wrapper input:focus {
+    border: 1.5px solid #008cff;
+}
+.auth-wrapper button {
+    background: #008cff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+.auth-wrapper button:hover {
+    background: #005fa3;
+}
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 1rem;
+    text-align: center;
+    background: #ffe6f6;
+    color: #a259ff;
+    border: 1px solid #a259ff44;
+}
+
+/* Estilos para a página de detalhes da prova */
+.questao-item {
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff !important;
+    transition: all 0.3s ease;
+}
+
+.questao-item:hover {
+    background-color: #e9ecef;
+    transform: translateX(5px);
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-badge.inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.card.bg-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, #17a2b8, #117a8b) !important;
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+}
+
+.card .card-body h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.alternativas .form-check-label {
+    cursor: default;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease;
+}
+
+.alternativas .form-check-label:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.alternativas .form-check-label.text-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.breadcrumb-title a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb-title a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}

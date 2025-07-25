@@ -1,0 +1,39 @@
+@page
+@model WebUI.Pages.Alunos.FormModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Editar Aluno" : "Novo Aluno";
+}
+<div class="turmas-form-container">
+    <h2 style="color:#008cff;">@ViewData["Title"]</h2>
+    <form method="post">
+        <input type="hidden" asp-for="Aluno.ID" />
+        <div>
+            <label asp-for="Aluno.NOME">Nome Completo</label>
+            <input asp-for="Aluno.NOME" required />
+        </div>
+        <div>
+            <label asp-for="Aluno.EMAIL">E-mail</label>
+            <input asp-for="Aluno.EMAIL" type="email" required />
+        </div>
+        <div>
+            <label asp-for="Aluno.USUARIO">Usuário</label>
+            <input asp-for="Aluno.USUARIO" required />
+        </div>
+        <div>
+            <label asp-for="Aluno.TurmaId">Turma</label>
+            <select asp-for="Aluno.TurmaId" required>
+                <option value="">Selecione...</option>
+                @foreach (var turma in Model.Turmas)
+                {
+                    <option value="@turma.ID">@turma.Serie</option>
+                }
+            </select>
+        </div>
+        <button class="turmas-btn" type="submit">@(Model.IsEdit ? "Atualizar" : "Cadastrar")</button>
+        <a href="/Alunos/Index" class="turmas-btn" style="text-decoration:none;display:inline-block;margin-left:10px;">Voltar</a>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert">@Model.ErrorMessage</div>
+        }
+    </form>
+</div> 

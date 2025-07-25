@@ -1,0 +1,284 @@
+@page
+@model WebUI.Pages.Provas.FormModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Editar Prova" : "Nova Prova";
+}
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">
+                <a href="/Provas/Index">Provas</a>
+            </div>
+            <div class="ps-3">
+                <i class="bx bx-chevron-right"></i>
+                <span>@(Model.IsEdit ? "Editar" : "Nova")</span>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-body">
+                <form method="post" id="provaForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Prova.Titulo" class="form-label">Título da Prova *</label>
+                                <input asp-for="Prova.Titulo" class="form-control" required />
+                                <span asp-validation-for="Prova.Titulo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Prova.TurmaId" class="form-label">Turma *</label>
+                                <select asp-for="Prova.TurmaId" class="form-select" required>
+                                    <option value="">Selecione uma turma</option>
+                                    @foreach (var turma in Model.Turmas)
+                                    {
+                                        <option value="@turma.ID">@turma.Serie</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Prova.TurmaId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Prova.Descricao" class="form-label">Descrição</label>
+                        <textarea asp-for="Prova.Descricao" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Prova.Descricao" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Prova.TempoLimite" class="form-label">Tempo Limite (minutos) *</label>
+                                <input asp-for="Prova.TempoLimite" type="number" class="form-control" min="1" required />
+                                <span asp-validation-for="Prova.TempoLimite" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="Prova.Ativa" class="form-check-input" type="checkbox" />
+                                    <label asp-for="Prova.Ativa" class="form-check-label">Prova Ativa</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Questões</h5>
+                        <button type="button" class="btn btn-success" onclick="adicionarQuestao()">
+                            <i class="bx bx-plus"></i> Adicionar Questão
+                        </button>
+                    </div>
+
+                    <div id="questoes-container">
+                        @if (Model.Questoes != null && Model.Questoes.Any())
+                        {
+                            @for (int i = 0; i < Model.Questoes.Count; i++)
+                            {
+                                <div class="questao-item card mb-3" data-index="@i">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6>Questão @(i + 1)</h6>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removerQuestao(@i)">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Enunciado *</label>
+                                            <textarea name="Questoes[@i].Enunciado" class="form-control" rows="3" required>@Model.Questoes[i].Enunciado</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Pontos</label>
+                                            <input type="number" name="Questoes[@i].Pontos" class="form-control" value="@Model.Questoes[i].Pontos" min="1" />
+                                        </div>
+                                        <div class="alternativas-container">
+                                            <label class="form-label">Alternativas *</label>
+                                            @for (int j = 0; j < Model.Questoes[i].Alternativas.Count; j++)
+                                            {
+                                                <div class="alternativa-item d-flex align-items-center mb-2">
+                                                    <input type="text" name="Questoes[@i].Alternativas[@j].Letra" class="form-control me-2" style="width: 60px;" value="@Model.Questoes[i].Alternativas[j].Letra" placeholder="A" required />
+                                                    <input type="text" name="Questoes[@i].Alternativas[@j].Texto" class="form-control me-2" value="@Model.Questoes[i].Alternativas[j].Texto" placeholder="Texto da alternativa" required />
+                                                    <div class="form-check me-2">
+                                                        <input type="radio" name="Questoes[@i].AlternativaCorreta" value="@j" class="form-check-input" @(Model.Questoes[i].Alternativas[j].Correta ? "checked" : "") required />
+                                                        <label class="form-check-label">Correta</label>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerAlternativa(this)">
+                                                        <i class="bx bx-trash"></i>
+                                                    </button>
+                                                </div>
+                                            }
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarAlternativa(@i)">
+                                                <i class="bx bx-plus"></i> Adicionar Alternativa
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/Provas/Index" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            @(Model.IsEdit ? "Atualizar" : "Criar") Prova
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let questaoIndex = @(Model.Questoes?.Count ?? 0);
+
+function adicionarQuestao() {
+    if (questaoIndex >= 10) {
+        alert('Máximo de 10 questões permitido!');
+        return;
+    }
+
+    const container = document.getElementById('questoes-container');
+    const questaoHtml = `
+        <div class="questao-item card mb-3" data-index="${questaoIndex}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6>Questão ${questaoIndex + 1}</h6>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removerQuestao(${questaoIndex})">
+                    <i class="bx bx-trash"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Enunciado *</label>
+                    <textarea name="Questoes[${questaoIndex}].Enunciado" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pontos</label>
+                    <input type="number" name="Questoes[${questaoIndex}].Pontos" class="form-control" value="1" min="1" />
+                </div>
+                <div class="alternativas-container">
+                    <label class="form-label">Alternativas *</label>
+                    <div class="alternativa-item d-flex align-items-center mb-2">
+                        <input type="text" name="Questoes[${questaoIndex}].Alternativas[0].Letra" class="form-control me-2" style="width: 60px;" value="A" placeholder="A" required />
+                        <input type="text" name="Questoes[${questaoIndex}].Alternativas[0].Texto" class="form-control me-2" placeholder="Texto da alternativa" required />
+                        <div class="form-check me-2">
+                            <input type="radio" name="Questoes[${questaoIndex}].AlternativaCorreta" class="form-check-input" value="0" required />
+                            <label class="form-check-label">Correta</label>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerAlternativa(this)">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarAlternativa(${questaoIndex})">
+                        <i class="bx bx-plus"></i> Adicionar Alternativa
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', questaoHtml);
+    questaoIndex++;
+}
+
+function removerQuestao(index) {
+    const questao = document.querySelector(`[data-index="${index}"]`);
+    if (questao) {
+        questao.remove();
+        reindexarQuestoes();
+    }
+}
+
+function adicionarAlternativa(questaoIndex) {
+    const container = document.querySelector(`[data-index="${questaoIndex}"] .alternativas-container`);
+    const alternativas = container.querySelectorAll('.alternativa-item');
+    const alternativaIndex = alternativas.length;
+    
+    const alternativaHtml = `
+        <div class="alternativa-item d-flex align-items-center mb-2">
+            <input type="text" name="Questoes[${questaoIndex}].Alternativas[${alternativaIndex}].Letra" class="form-control me-2" style="width: 60px;" value="${String.fromCharCode(65 + alternativaIndex)}" placeholder="A" required />
+            <input type="text" name="Questoes[${questaoIndex}].Alternativas[${alternativaIndex}].Texto" class="form-control me-2" placeholder="Texto da alternativa" required />
+            <div class="form-check me-2">
+                <input type="radio" name="Questoes[${questaoIndex}].AlternativaCorreta" class="form-check-input" value="${alternativaIndex}" required />
+                <label class="form-check-label">Correta</label>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerAlternativa(this)">
+                <i class="bx bx-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    const addButton = container.querySelector('.btn-outline-primary');
+    addButton.insertAdjacentHTML('beforebegin', alternativaHtml);
+}
+
+function removerAlternativa(button) {
+    const alternativa = button.closest('.alternativa-item');
+    if (alternativa) {
+        alternativa.remove();
+    }
+}
+
+function reindexarQuestoes() {
+    const questoes = document.querySelectorAll('.questao-item');
+    questoes.forEach((questao, index) => {
+        questao.setAttribute('data-index', index);
+        questao.querySelector('h6').textContent = `Questão ${index + 1}`;
+        
+        // Reindexar inputs
+        const inputs = questao.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                input.setAttribute('name', name.replace(/Questoes\[\d+\]/, `Questoes[${index}]`));
+            }
+        });
+    });
+    questaoIndex = questoes.length;
+}
+
+document.getElementById('provaForm').addEventListener('submit', function(e) {
+    const questoes = document.querySelectorAll('.questao-item');
+    if (questoes.length === 0) {
+        e.preventDefault();
+        alert('Adicione pelo menos uma questão!');
+        return;
+    }
+    
+    questoes.forEach((questao, index) => {
+        const alternativas = questao.querySelectorAll('.alternativa-item');
+        if (alternativas.length < 2) {
+            e.preventDefault();
+            alert(`Questão ${index + 1} deve ter pelo menos 2 alternativas!`);
+            return;
+        }
+        
+        const corretas = questao.querySelectorAll('input[type="radio"]:checked');
+        if (corretas.length === 0) {
+            e.preventDefault();
+            alert(`Questão ${index + 1} deve ter uma alternativa correta!`);
+            return;
+        }
+    });
+});
+</script> 

@@ -1,0 +1,29 @@
+@page
+@model WebUI.Pages.Turmas.FormModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Editar Turma" : "Nova Turma";
+}
+<div class="turmas-form-container">
+    <h2 style="color:#008cff;">@ViewData["Title"]</h2>
+    <form method="post">
+        <input type="hidden" asp-for="Turma.ID" />
+        <div>
+            <label asp-for="Turma.Disciplina">Disciplina</label>
+            <input asp-for="Turma.Disciplina" required />
+        </div>
+        <div>
+            <label asp-for="Turma.Serie">Série</label>
+            <input asp-for="Turma.Serie" required />
+        </div>
+        <div>
+            <label asp-for="Turma.Turno">Turno</label>
+            <input asp-for="Turma.Turno" required />
+        </div>
+        <button class="turmas-btn" type="submit">Salvar</button>
+        <a class="turmas-btn" href="/Turmas/Index">Voltar</a>
+    </form>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert">@Model.ErrorMessage</div>
+    }
+</div> 

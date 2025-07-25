@@ -1,0 +1,24 @@
+﻿@page
+@model WebUI.Pages.Auth.LoginModel
+
+<div class="auth-wrapper">
+    <form method="post" style="max-width: 480px; min-width: 350px;">
+        <h2 style="margin-bottom: 1.5rem; text-align:center; color:#008cff;">Login</h2>
+        <div>
+            <label for="username">Usuário</label>
+            <input type="text" id="username" name="username" required />
+        </div>
+        <div>
+            <label for="password">Senha</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit">Entrar</button>
+        <a class="turmas-btn" href="/Auth/CadastroProfessor" style="margin-top:1rem;display:block;text-align:center;">Quero criar uma conta de professor</a>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert">
+                @Model.ErrorMessage
+            </div>
+        }
+    </form>
+</div>

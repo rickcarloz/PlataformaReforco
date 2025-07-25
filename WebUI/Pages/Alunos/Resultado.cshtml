@@ -1,0 +1,212 @@
+@page
+@model WebUI.Pages.Alunos.ResultadoModel
+@{
+    ViewData["Title"] = "Resultado da Prova";
+}
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">
+                <a href="/Alunos/Provas" class="text-decoration-none">
+                    <i class="bx bx-arrow-back"></i> Voltar para Provas
+                </a>
+            </div>
+            <div class="ps-3 ms-auto">
+                <h4 class="mb-0">Resultado da Prova</h4>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (Model.Resultado != null)
+        {
+            <!-- Informações da Prova -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-book-open"></i> @Model.Resultado.ProvaTitulo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Turma:</strong> @Model.Resultado.TurmaNome
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Professor:</strong> @Model.Resultado.ProfessorNome
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Data:</strong> @Model.Resultado.DataFim?.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Tempo Gasto:</strong> @Model.Resultado.TempoGasto min
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultado do Aluno -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card @(Model.Resultado.Nota >= 7 ? "bg-success" : Model.Resultado.Nota >= 5 ? "bg-warning" : "bg-danger") text-white">
+                        <div class="card-body text-center">
+                            <h3>@Model.Resultado.Nota.ToString("F1")</h3>
+                            <p class="mb-0">Sua Nota</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h3>@Model.Resultado.Acertos / @Model.Resultado.TotalQuestoes</h3>
+                            <p class="mb-0">Questões Corretas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card @(Model.Resultado.Aprovado ? "bg-success" : "bg-danger") text-white">
+                        <div class="card-body text-center">
+                            <h3>@(Model.Resultado.Aprovado ? "Aprovado" : "Reprovado")</h3>
+                            <p class="mb-0">Status</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recomendações do ChatGPT -->
+            @if (Model.Resultado.RecomendacoesLiberadas)
+            {
+                if (!string.IsNullOrEmpty(Model.Resultado.RecomendacoesChatGPT))
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bx bx-brain"></i> Recomendações Personalizadas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chatgpt-recommendations">
+                                @Html.Raw(Model.Resultado.RecomendacoesChatGPT.Replace("\n", "<br>"))
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bx bx-time" style="font-size: 3rem; color: #ccc;"></i>
+                            <h5 class="mt-3">Recomendações em Processamento</h5>
+                            <p class="text-muted">Suas recomendações personalizadas estarão disponíveis em breve.</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bx bx-lock" style="font-size: 3rem; color: #ccc;"></i>
+                        <h5 class="mt-3">Aguardando liberação do professor</h5>
+                        <p class="text-muted">Assim que o professor liberar, suas recomendações personalizadas aparecerão aqui.</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Detalhes das Questões -->
+            @if (Model.DetalhesQuestoes != null && Model.DetalhesQuestoes.Any())
+            {
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-list-ul"></i> Detalhes das Questões
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var questao in Model.DetalhesQuestoes)
+                        {
+                            <div class="questao-resultado mb-3 p-3 border rounded @(questao.Correta ? "border-success" : "border-danger")">
+                                <h6 class="mb-2">
+                                    <strong>Questão @questao.NumeroQuestao:</strong> @questao.TextoQuestao
+                                </h6>
+                                
+                                <div class="respostas">
+                                    <p class="mb-1">
+                                        <strong>Sua resposta:</strong> 
+                                        <span class="@(questao.Correta ? "text-success" : "text-danger")">
+                                            @questao.RespostaEscolhida
+                                        </span>
+                                    </p>
+                                    
+                                    @if (!questao.Correta)
+                                    {
+                                        <p class="mb-1">
+                                            <strong>Resposta correta:</strong> 
+                                            <span class="text-success">@questao.RespostaCorreta</span>
+                                        </p>
+                                    }
+                                    
+                                    <span class="badge @(questao.Correta ? "bg-success" : "bg-danger")">
+                                        @(questao.Correta ? "Correta" : "Incorreta")
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bx bx-error-circle" style="font-size: 3rem; color: #dc3545;"></i>
+                    <h5 class="mt-3">Resultado não encontrado</h5>
+                    <p class="text-muted">O resultado da prova solicitada não foi encontrado ou você não tem permissão para visualizá-lo.</p>
+                    <a href="/Alunos/Provas" class="btn btn-primary">Voltar para Provas</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .chatgpt-recommendations {
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+    
+    .chatgpt-recommendations h3 {
+        color: #007bff;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chatgpt-recommendations h3:first-child {
+        margin-top: 0;
+    }
+    
+    .questao-resultado {
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .questao-resultado:hover {
+        transform: translateX(5px);
+    }
+    
+    .questao-resultado.border-success {
+        border-left: 4px solid #28a745 !important;
+    }
+    
+    .questao-resultado.border-danger {
+        border-left: 4px solid #dc3545 !important;
+    }
+</style> 
